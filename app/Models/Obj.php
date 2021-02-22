@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Support\Str;
+use App\Models\Traits\RelatesToTeams;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 class Obj extends Model
 {
-    use HasFactory;
+    use HasFactory, RelatesToTeams, HasRecursiveRelationships;
 
     public $table = "objects";
 
@@ -23,14 +25,8 @@ class Obj extends Model
         });
     }
 
-
     public function objectable()
     {
         return $this->morphTo();
-    }
-
-    public function children()
-    {
-        return $this->hasMany(Obj::class, "parent_id", "id");
     }
 }

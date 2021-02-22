@@ -15,15 +15,14 @@ class FileController extends Controller
     public function index(Request $request)
     {
         // For current team
-        $object = Obj::where("team_id", $request->user()->currentTeam->id)->where(
+        $object = Obj::with("children.objectable", "ancestorsAndSelf.objectable")->forCurrentTeam()->where(
             "uuid",
-            $request->get("uuid", Obj::where("team_id", $request->user()->currentTeam->id)->whereNull("parent_id")->first()->uuid)
+            $request->get("uuid", Obj::forCurrentTeam()->whereNull("parent_id")->first()->uuid)
         )->firstOrFail();
 
-        // dd($object);
-
         return view("files", [
-            "object" => $object
+            "object" => $object,
+            "ancestors" => $object->ancestorsAndSelf()->breadthFirst()->get()
         ]);
     }
 }
