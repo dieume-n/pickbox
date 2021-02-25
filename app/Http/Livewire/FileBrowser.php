@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Obj;
 use Livewire\Component;
 
 class FileBrowser extends Component
@@ -11,14 +12,52 @@ class FileBrowser extends Component
     public $creatingNewFolder = false;
     public $folder;
     public $renamingObject;
+    public $renamingObjectState;
 
     protected $rules = [
         "folder" => "required|max:255",
     ];
 
     protected $messages = [
+        "renamingObjectState.name.required" => "The object name cannot be empty",
         "folder.required" => "The folder name cannot be empty"
     ];
+
+    protected $renamingObjectRules = [
+        "renamingObjectState.name" => "required|max:255",
+    ];
+
+    protected $renamingObjectMessages = [
+        "renamingObjectState.name.required" => "The object name cannot be empty",
+    ];
+
+
+    public function updatingRenamingObject($id)
+    {
+        if ($id === null) {
+            return;
+        }
+
+        if ($object = Obj::forCurrentTeam()->find($id)) {
+            $this->renamingObjectState = [
+                "name" => $object->objectable->name
+            ];
+        }
+    }
+
+
+    public function renameObject()
+    {
+        $this->validate($this->renamingObjectRules, $this->renamingObjectMessages);
+
+        Obj::forCurrentTeam()
+            ->find($this->renamingObject)
+            ->objectable
+            ->update($this->renamingObjectState);
+
+        $this->reset(['renamingObject', 'renamingObjectState']);
+        $this->object = $this->object->fresh();
+    }
 
 
     public function createFolder()
@@ -31,8 +70,7 @@ class FileBrowser extends Component
         ]));
         $object->save();
 
-        $this->reset('folder');
-        $this->creatingNewFolder = false;
+        $this->reset(['folder', 'creatingNewFolder']);
         $this->object = $this->object->fresh();
     }
 

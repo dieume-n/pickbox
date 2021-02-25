@@ -95,11 +95,13 @@
                             </div>
 
                             @if ($renamingObject === $child->id)
-                            <form class="flex items-center w-full h-16 ml-2 space-x-2">
+
+                            <form class="flex items-center w-full h-16 ml-2 space-x-2"
+                                wire:submit.prevent="renameObject">
                                 <div class="relative flex-grow ">
                                     <input type="text" class="block w-full h-10 px-3 border border-gray-300 rounded-md"
-                                        placeholder="Rename this object" wire:model="folder">
-                                    @error('folder') <p class="absolute left-0 text-sm text-red-600">
+                                        placeholder="Rename this object" wire:model="renamingObjectState.name">
+                                    @error('renamingObjectState.name') <p class="absolute left-0 text-sm text-red-600">
                                         {{ $message }}</p>
                                     @enderror
                                 </div>
