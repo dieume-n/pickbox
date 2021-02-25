@@ -5,7 +5,8 @@
             <x-jet-input-error for="search" class="mt-2" />
         </div>
         <div class="order-2 sm:space-x-3">
-            <button class="px-4 py-2 text-gray-800 bg-gray-200 rounded-lg">New folder</button>
+            <button class="px-4 py-2 text-gray-800 bg-gray-200 rounded-lg"
+                wire:click="$set('creatingNewFolder', true)">New folder</button>
             <button class="px-4 py-2 font-bold text-gray-100 bg-blue-600 rounded-lg">Upload files</button>
         </div>
     </div>
@@ -40,6 +41,35 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @if ($creatingNewFolder)
+                    <tr class="border-b-2 border-gray-100 hover:bg-gray-100">
+                        <td class="p-3 ">
+                            <form class="flex items-center h-16 space-x-2" wire:submit.prevent="createFolder">
+                                <div class="relative flex-grow ">
+                                    <input type="text" class="block w-full h-10 px-3 border border-gray-300 rounded-md"
+                                        placeholder="Create a new folder" wire:model="folder">
+                                    @error('folder') <p class="absolute left-0 text-sm text-red-600">
+                                        {{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button type="submit" class="px-4 py-2 text-gray-100 bg-blue-600 rounded-lg">
+                                        Create
+                                    </button>
+                                    <button type="button" wire:click="$set('creatingNewFolder', false)"
+                                        class="px-4 py-2 text-gray-800 bg-gray-200 rounded-lg">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    @endif
+
                     @foreach ($object->children as $child)
                     <tr class="border-b-2 border-gray-100 hover:bg-gray-100">
                         <td class="flex items-center px-3 py-2">
@@ -64,6 +94,26 @@
                                 @endif
                             </div>
 
+                            @if ($renamingObject === $child->id)
+                            <form class="flex items-center w-full h-16 ml-2 space-x-2">
+                                <div class="relative flex-grow ">
+                                    <input type="text" class="block w-full h-10 px-3 border border-gray-300 rounded-md"
+                                        placeholder="Rename this object" wire:model="folder">
+                                    @error('folder') <p class="absolute left-0 text-sm text-red-600">
+                                        {{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button type="submit" class="px-4 py-2 text-gray-100 bg-blue-600 rounded-lg">
+                                        Rename
+                                    </button>
+                                    <button type="button" wire:click="$set('renamingObject', null)"
+                                        class="px-4 py-2 text-gray-800 bg-gray-200 rounded-lg">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                            @else
                             @if ($child->objectable_type == "file")
                             <a href="" class="flex-grow p-2 font-bold text-blue-700">
                                 {{ $child->objectable->name }}
@@ -76,6 +126,9 @@
                                 {{ $child->objectable->name }}
                             </a>
                             @endif
+
+                            @endif
+
                         </td>
                         <td class="px-3 py-2">
                             @if ($child->objectable_type == "file")
@@ -91,7 +144,9 @@
                             <div class="flex items-center justify-end ">
                                 <ul class="flex items-center space-x-4">
                                     <li>
-                                        <button class="font-bold text-gray-600">
+                                        <button type="button"
+                                            class="font-bold text-gray-600 active:outline-none focus:outline-none"
+                                            wire:click="$set('renamingObject', {{ $child->id }})">
                                             Rename
                                         </button>
                                     </li>
