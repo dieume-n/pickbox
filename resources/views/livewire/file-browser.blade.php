@@ -7,7 +7,8 @@
         <div class="order-2 sm:space-x-3">
             <button class="px-4 py-2 text-gray-800 bg-gray-200 rounded-lg"
                 wire:click="$set('creatingNewFolder', true)">New folder</button>
-            <button class="px-4 py-2 font-bold text-gray-100 bg-blue-600 rounded-lg">Upload files</button>
+            <button type="button" class="px-4 py-2 font-bold text-gray-100 bg-blue-600 rounded-lg"
+                wire:click.prevent="$set('showUploadFilesForm', true)">Upload files</button>
         </div>
     </div>
 
@@ -170,6 +171,30 @@
             This folder is empty
         </div>
         @endif
-
     </div>
+
+    <x-jet-modal wire:model="showUploadFilesForm">
+
+        <div wire:ignore class="m-3 border-2 border-dashed" x-data="{pond: null}" x-init="
+
+            pond = FilePond.create($refs.filepond);
+            pond.setOptions({
+                server: {
+                    process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+                        @this.upload('upload', file, load, error, progress)
+                    },
+                    revert: (filename, load) => {
+                        @this.removeUpload('upload', filename, load)
+                    }
+                },
+            });
+
+            
+        ">
+            <div>
+                <input type="file" x-ref="filepond" multiple>
+            </div>
+        </div>
+
+    </x-jet-modal>
 </div>
